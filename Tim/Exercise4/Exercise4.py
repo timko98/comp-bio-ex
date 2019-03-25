@@ -3,9 +3,9 @@ Computational Biology I: Quantitative Data Analysis
                 Fruehjahrsemester 2019
                        Exercise 4
 """
+import matplotlib.pyplot as plt
 import numpy as np
 from scipy import stats
-import matplotlib.pyplot as plt
 
 
 def uniformPDF(x, a=0.0, b=4.0):
@@ -84,7 +84,7 @@ def exponentialMean(m, a=1.0):
        In [2]: exponentialMean(2)
        Out[2]: 1.6322926962391706
     """
-    s = np.mean(exponentialRVS(m,a))
+    s = np.mean(exponentialRVS(m, a))
     return (s)
 
 
@@ -104,7 +104,7 @@ def paretoMean(m, b=2.0):
        In [2]: paretoMean(2)
        Out[2]: 1.3419141482243173
     """
-    s = np.mean(paretoRVS(m,b))
+    s = np.mean(paretoRVS(m, b))
     return (s)
 
 
@@ -126,9 +126,9 @@ def uniformMeans(n, m, a=0.0, b=4.0):
        In [2]: uniformMeans(4,2)
        Out[2]: array([ 2.20206943,  2.84842631,  1.44178502,  2.43703912])
     """
-    v = np.zeros(n+1)
+    v = np.zeros(n)
     for i in range(len(v)):
-        v[i] = uniformMean(m,a,b)
+        v[i] = uniformMean(m, a, b)
     return (v)
 
 
@@ -149,7 +149,7 @@ def exponentialMeans(n, m, a=1.0):
        In [2]: exponentialMeans(4,2)
        Out[2]: array([ 2.11823173,  1.33106409,  1.55833024,  1.36089404])
     """
-    v = np.zeros(n + 1)
+    v = np.zeros(n)
     for i in range(len(v)):
         v[i] = exponentialMean(m, a)
     return (v)
@@ -172,7 +172,7 @@ def paretoMeans(n, m, b=2.0):
       In [2]: paretoMeans(4,2)
       Out[2]: array([ 2.27185097,  1.57569186,  3.32299622,  1.7457624 ])
     """
-    v = np.zeros(n + 1)
+    v = np.zeros(n)
     for i in range(len(v)):
         v[i] = paretoMean(m, b)
     return (v)
@@ -240,6 +240,10 @@ def fourCumulants(x):
        -0.051635297540346875,
        -0.095295067366394037)
     """
+    c1 = np.mean(x)
+    c2 = np.var(x)
+    c3 = np.mean(np.subtract(x, c1)**3)
+    c4 = np.mean(np.subtract(x, c1)**4) - 3 * (np.mean(x**2) - c1**2)**2
     return (c1, c2, c3, c4)
 
 
@@ -268,6 +272,23 @@ def cumulantsOfMeans(dist, M, n=10000):
               [-0.00855118, -0.01235707, -0.00283194, -0.00584591, -0.00739828],
               [-2.1174904 , -0.28100373, -0.07818415, -0.03272124, -0.01731555]])
     """
+    C = np.zeros((4, M))
+
+    if dist == 0:
+        for i in range(M):
+            cumulants = fourCumulants(uniformMeans(n, i+1))
+            C[:, i] = cumulants
+
+    if dist == 1:
+        for i in range(M):
+            cumulants = fourCumulants(exponentialMeans(n, i+1))
+            C[:, i] = cumulants
+
+    if dist == 2:
+        for i in range(M):
+            cumulants = fourCumulants(paretoMeans(n, i+1))
+            C[:, i] = cumulants
+
     return (C)
 
 
@@ -310,6 +331,7 @@ def zScore(x):
        In [2]: zScore(u)
        Out[2]: array([ 0.04043301, -0.88987265, -1.03062589,  0.11028011,  1.76978542])
     """
+    z = (x - np.mean(x)) / np.sqrt(np.var(x))
     return (z)
 
 
@@ -334,6 +356,8 @@ def gaussianApproximation(n, me=0.0, sd=1.0):
        array([ 2.86644104,  3.03176111,  3.12001852, ...,  2.89964535,
                2.97468303,  2.93763211])
     """
+    x = zScore(uniformMeans(n, 10))
+    x = x * sd + me
     return (x)
 
 
@@ -344,8 +368,3 @@ def plot_gaussianApproximation(n, me=0.0, sd=1.0):
     plt.hist(x2, 50, histtype='step', edgecolor='green', facecolor='none', linewidth=2)
     plt.show()
     plt.clf()
-
-
-if __name__ == '__main__':
-    r = exponentialMeans(4,2)
-    print(r)

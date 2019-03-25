@@ -7,39 +7,47 @@ import numpy as np
 from scipy import stats
 import matplotlib.pyplot as plt
 
-def uniformPDF(x,a=0.0,b=4.0):
-    p = 1.0/(b-a)*np.ones((len(x)))
-    p[x<a] = 0.0
-    p[x>b] = 0.0
-    return(p)
 
-def exponentialPDF(x,a=1.0):
-    p = a*np.exp(-a*x)
-    p[x<0] = 0.0
-    return(p)
+def uniformPDF(x, a=0.0, b=4.0):
+    p = 1.0 / (b - a) * np.ones((len(x)))
+    p[x < a] = 0.0
+    p[x > b] = 0.0
+    return (p)
 
-def paretoPDF(x,b=2.0):
-    p = b/(x**(b+1.0))
-    p[x<1] = 0.0
-    return(p)
 
-def uniformRVS(m,a,b):
-    rvs = a + stats.uniform.rvs(size=m)*(b-a)
-    return(rvs)
+def exponentialPDF(x, a=1.0):
+    p = a * np.exp(-a * x)
+    p[x < 0] = 0.0
+    return (p)
 
-def exponentialRVS(m,a):
-    rvs = stats.expon.rvs(scale=1.0/a,size=m)
-    return(rvs)
 
-def paretoRVS(m,b):
-    rvs = stats.pareto.rvs(b,size=m)
-    return(rvs)
+def paretoPDF(x, b=2.0):
+    p = b / (x ** (b + 1.0))
+    p[x < 1] = 0.0
+    return (p)
 
-def normalRVS(m,mu=0.0,sigma2=1.0):
-    rvs = stats.norm.rvs(loc=mu,scale=np.sqrt(sigma2),size=m)
-    return(rvs)
 
-def uniformMean(m,a=0.0,b=4.0):
+def uniformRVS(m, a, b):
+    rvs = a + stats.uniform.rvs(size=m) * (b - a)
+    return (rvs)
+
+
+def exponentialRVS(m, a):
+    rvs = stats.expon.rvs(scale=1.0 / a, size=m)
+    return (rvs)
+
+
+def paretoRVS(m, b):
+    rvs = stats.pareto.rvs(b, size=m)
+    return (rvs)
+
+
+def normalRVS(m, mu=0.0, sigma2=1.0):
+    rvs = stats.norm.rvs(loc=mu, scale=np.sqrt(sigma2), size=m)
+    return (rvs)
+
+
+def uniformMean(m, a=0.0, b=4.0):
     """
     Call:
        s = uniformMean(m,a,b)
@@ -56,9 +64,11 @@ def uniformMean(m,a=0.0,b=4.0):
        In [2]: uniformMean(2)
        Out[2]: 1.7787091976146681
     """
-    return(s)
+    s = np.mean(uniformRVS(m, a, b))
+    return (s)
 
-def exponentialMean(m,a=1.0):
+
+def exponentialMean(m, a=1.0):
     """
     Call:
        s = exponentialMean(m,a)
@@ -74,9 +84,11 @@ def exponentialMean(m,a=1.0):
        In [2]: exponentialMean(2)
        Out[2]: 1.6322926962391706
     """
-    return(s)
+    s = np.mean(exponentialRVS(m,a))
+    return (s)
 
-def paretoMean(m,b=2.0):
+
+def paretoMean(m, b=2.0):
     """
     Call:
        s = paretoMean(m,b)
@@ -92,9 +104,11 @@ def paretoMean(m,b=2.0):
        In [2]: paretoMean(2)
        Out[2]: 1.3419141482243173
     """
-    return(s)
+    s = np.mean(paretoRVS(m,b))
+    return (s)
 
-def uniformMeans(n,m,a=0.0,b=4.0):
+
+def uniformMeans(n, m, a=0.0, b=4.0):
     """
     Call:
        v = uniformMeans(n,m,a,b)
@@ -112,9 +126,13 @@ def uniformMeans(n,m,a=0.0,b=4.0):
        In [2]: uniformMeans(4,2)
        Out[2]: array([ 2.20206943,  2.84842631,  1.44178502,  2.43703912])
     """
-    return(v)
+    v = np.zeros(n+1)
+    for i in range(len(v)):
+        v[i] = uniformMean(m,a,b)
+    return (v)
 
-def exponentialMeans(n,m,a=1.0):
+
+def exponentialMeans(n, m, a=1.0):
     """
     Call:
        v = exponentialMeans(n,m,a)
@@ -131,9 +149,13 @@ def exponentialMeans(n,m,a=1.0):
        In [2]: exponentialMeans(4,2)
        Out[2]: array([ 2.11823173,  1.33106409,  1.55833024,  1.36089404])
     """
-    return(v)
+    v = np.zeros(n + 1)
+    for i in range(len(v)):
+        v[i] = exponentialMean(m, a)
+    return (v)
 
-def paretoMeans(n,m,b=2.0):
+
+def paretoMeans(n, m, b=2.0):
     """
     Call:
        v = parteoMeans(n,m,b)
@@ -150,7 +172,11 @@ def paretoMeans(n,m,b=2.0):
       In [2]: paretoMeans(4,2)
       Out[2]: array([ 2.27185097,  1.57569186,  3.32299622,  1.7457624 ])
     """
-    return(v)
+    v = np.zeros(n + 1)
+    for i in range(len(v)):
+        v[i] = paretoMean(m, b)
+    return (v)
+
 
 def plot_DistributionMeans(dist):
     """
@@ -165,23 +191,24 @@ def plot_DistributionMeans(dist):
     # generate a 1000 samples of means of 2,3 and 10 uniform RVS each
     M = 1000
     if dist == 0:
-        u2 = uniformMeans(M,2)
-        u3 = uniformMeans(M,3)
-        u10 = uniformMeans(M,10)
+        u2 = uniformMeans(M, 2)
+        u3 = uniformMeans(M, 3)
+        u10 = uniformMeans(M, 10)
     elif dist == 1:
-        u2 = exponentialMeans(M,2)
-        u3 = exponentialMeans(M,3)
-        u10 = exponentialMeans(M,10)
+        u2 = exponentialMeans(M, 2)
+        u3 = exponentialMeans(M, 3)
+        u10 = exponentialMeans(M, 10)
     elif dist == 2:
-        u2 = paretoMeans(M,2)
-        u3 = paretoMeans(M,3)
-        u10 = paretoMeans(M,10)
+        u2 = paretoMeans(M, 2)
+        u3 = paretoMeans(M, 3)
+        u10 = paretoMeans(M, 10)
     # plot as histograms
-    plt.hist(u2,25,histtype='step',edgecolor='blue',facecolor='none',linewidth=2)
-    plt.hist(u3,25,histtype='step',edgecolor='green',facecolor='none',linewidth=2)
-    plt.hist(u10,25,histtype='step',edgecolor='red',facecolor='none',linewidth=2)
+    plt.hist(u2, 25, histtype='step', edgecolor='blue', facecolor='none', linewidth=2)
+    plt.hist(u3, 25, histtype='step', edgecolor='green', facecolor='none', linewidth=2)
+    plt.hist(u10, 25, histtype='step', edgecolor='red', facecolor='none', linewidth=2)
     plt.show()
     plt.clf()
+
 
 def fourCumulants(x):
     """
@@ -213,9 +240,10 @@ def fourCumulants(x):
        -0.051635297540346875,
        -0.095295067366394037)
     """
-    return(c1,c2,c3,c4)
+    return (c1, c2, c3, c4)
 
-def cumulantsOfMeans(dist,M,n=10000):
+
+def cumulantsOfMeans(dist, M, n=10000):
     """
     Call:
        v = cumulantsOfMeans(dist,M,n)
@@ -240,26 +268,28 @@ def cumulantsOfMeans(dist,M,n=10000):
               [-0.00855118, -0.01235707, -0.00283194, -0.00584591, -0.00739828],
               [-2.1174904 , -0.28100373, -0.07818415, -0.03272124, -0.01731555]])
     """
-    return(C)
+    return (C)
+
 
 def plot_cumulantsOfMeans(dist):
     M = 100
     # Generate your matrix of cumulants :
-    C = cumulantsOfMeans(dist,M)
+    C = cumulantsOfMeans(dist, M)
     # plot each of your 4 cumulants as a function of m=1,...,M
     if dist == 0 or dist == 1:
-        c1, = plt.plot(np.arange(M)+1,C[0,:])
-        c2, = plt.plot(np.arange(M)+1,C[1,:])
-        c3, = plt.plot(np.arange(M)+1,C[2,:])
-        c4, = plt.plot(np.arange(M)+1,C[3,:])
+        c1, = plt.plot(np.arange(M) + 1, C[0, :])
+        c2, = plt.plot(np.arange(M) + 1, C[1, :])
+        c3, = plt.plot(np.arange(M) + 1, C[2, :])
+        c4, = plt.plot(np.arange(M) + 1, C[3, :])
     else:
-        c1, = plt.semilogy(np.arange(M)+1,C[0,:])
-        c2, = plt.semilogy(np.arange(M)+1,C[1,:])
-        c3, = plt.semilogy(np.arange(M)+1,C[2,:])
-        c4, = plt.semilogy(np.arange(M)+1,C[3,:])
-    plt.legend([c1,c2,c3,c4],["mean","variance","skewness","kurtosis"])
+        c1, = plt.semilogy(np.arange(M) + 1, C[0, :])
+        c2, = plt.semilogy(np.arange(M) + 1, C[1, :])
+        c3, = plt.semilogy(np.arange(M) + 1, C[2, :])
+        c4, = plt.semilogy(np.arange(M) + 1, C[3, :])
+    plt.legend([c1, c2, c3, c4], ["mean", "variance", "skewness", "kurtosis"])
     plt.show()
     plt.clf()
+
 
 def zScore(x):
     """
@@ -280,9 +310,10 @@ def zScore(x):
        In [2]: zScore(u)
        Out[2]: array([ 0.04043301, -0.88987265, -1.03062589,  0.11028011,  1.76978542])
     """
-    return(z)
+    return (z)
 
-def gaussianApproximation(n,me=0.0,sd=1.0):
+
+def gaussianApproximation(n, me=0.0, sd=1.0):
     """
     Call:
        v = gaussianApproximation(n,me,sd)
@@ -303,13 +334,18 @@ def gaussianApproximation(n,me=0.0,sd=1.0):
        array([ 2.86644104,  3.03176111,  3.12001852, ...,  2.89964535,
                2.97468303,  2.93763211])
     """
-    return(x)
+    return (x)
 
-def plot_gaussianApproximation(n,me=0.0,sd=1.0):
-    x1 = gaussianApproximation(n,me,sd)
-    x2 = normalRVS(n,me,sd)
-    plt.hist(x1,50,histtype='step',edgecolor='blue',facecolor='none',linewidth=2)
-    plt.hist(x2,50,histtype='step',edgecolor='green',facecolor='none',linewidth=2)
+
+def plot_gaussianApproximation(n, me=0.0, sd=1.0):
+    x1 = gaussianApproximation(n, me, sd)
+    x2 = normalRVS(n, me, sd)
+    plt.hist(x1, 50, histtype='step', edgecolor='blue', facecolor='none', linewidth=2)
+    plt.hist(x2, 50, histtype='step', edgecolor='green', facecolor='none', linewidth=2)
     plt.show()
     plt.clf()
 
+
+if __name__ == '__main__':
+    r = exponentialMeans(4,2)
+    print(r)

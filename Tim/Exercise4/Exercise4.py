@@ -225,7 +225,7 @@ def fourCumulants(x):
        In [1]: u = uniformMeans(50,2)
 
        In [2]: fourCumulants(u)
-       Out[195]: 
+       Out[195]:
        (2.2088148839791724,
        0.67105003125814866,
        -0.072068671445580129,
@@ -234,7 +234,7 @@ def fourCumulants(x):
        In [3]: u = uniformMeans(50,2)
 
        In [4]: fourCumulants(u)
-       Out[4]: 
+       Out[4]:
        (2.0452126992181343,
        0.53514435619719569,
        -0.051635297540346875,
@@ -256,17 +256,17 @@ def cumulantsOfMeans(dist, M, n=10000):
        M: integer
        n: integer
     Output argument:
-       C: a 4-by-M numpy array. Nth row = Nth cumulant for the mean over 1...M random values. 
+       C: a 4-by-M numpy array. Nth row = Nth cumulant for the mean over 1...M random values.
     Examples:
        In [1]: cumulantsOfMeans(0,3)
-       Out[1]: 
+       Out[1]:
        array([[ 2.00058641,  1.99235859,  2.00111604],
               [ 1.33388974,  0.67359295,  0.43723978],
               [-0.00967865,  0.01280984,  0.00513898],
               [-2.12997463, -0.28156999, -0.07535785]])
 
        In [2]: cumulantsOfMeans(0,5)
-       Out[2]: 
+       Out[2]:
        array([[ 2.00008167,  2.01331328,  2.00421357,  2.00617495,  2.00430073],
               [ 1.32904624,  0.67287942,  0.44120348,  0.33495163,  0.27132572],
               [-0.00855118, -0.01235707, -0.00283194, -0.00584591, -0.00739828],
@@ -327,7 +327,7 @@ def zScore(x):
        Out[2]: array([-1.24665979, -0.29325619,  1.21160404,  1.1227908 , -0.79447886])
 
        In [1]: u = uniformMeans(5,2)
-       
+
        In [2]: zScore(u)
        Out[2]: array([ 0.04043301, -0.88987265, -1.03062589,  0.11028011,  1.76978542])
     """
@@ -347,17 +347,16 @@ def gaussianApproximation(n, me=0.0, sd=1.0):
        v: numpy array
     Examples:
        In [1]: gaussianApproximation(10000,3,0.1)
-       Out[1]: 
+       Out[1]:
        array([ 3.25481318,  3.20421592,  2.97242592, ...,  2.91381843,
                3.07523275,  2.9385334 ])
 
        In [2]: gaussianApproximation(10000,3,0.1)
-       Out[2]: 
+       Out[2]:
        array([ 2.86644104,  3.03176111,  3.12001852, ...,  2.89964535,
                2.97468303,  2.93763211])
     """
-    x = zScore(uniformMeans(n, 10))
-    x = x * sd + me
+    x = zScore(uniformMeans(n, 10)) * sd + me
     return (x)
 
 

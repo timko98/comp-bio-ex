@@ -196,14 +196,14 @@ def positiveFoldChange(x,dist,mu_u=100):
     Dmu = 0.01 # As before keep this step size for numerical integration
 
     if dist == 0:
-        p = 0
+        p_positive = np.sum(student_posterior(np.arange(0, mu_u + Dmu, Dmu), x) * Dmu)
     if dist == 1:
-        p = 0
+        p_positive = np.sum(gaussian_posterior(np.arange(0, mu_u + Dmu, Dmu), x) * Dmu)
 
     return(p_positive)
 
 
 if __name__ == '__main__':
     x = np.array([1, 2, 4, 0])
-    r = expectedFoldChange(x, 1)
+    r = positiveFoldChange(x,1)
     print(r)

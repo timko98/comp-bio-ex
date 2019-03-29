@@ -201,9 +201,3 @@ def positiveFoldChange(x,dist,mu_u=100):
         p_positive = np.sum(gaussian_posterior(np.arange(0, mu_u + Dmu, Dmu), x) * Dmu)
 
     return(p_positive)
-
-
-if __name__ == '__main__':
-    x = np.array([1, 2, 4, 0])
-    r = positiveFoldChange(x,1)
-    print(r)

@@ -104,7 +104,7 @@ def student_posterior(mu,x):
                0.23983857])
     """
 
-    integral,error = quad(student_likelihood, -inf, inf, args=x) # To be completed! Use -inf and inf as boundary, we imported them from you from scipy
+    integral, error = quad(student_likelihood, -inf, inf, args=x) # To be completed! Use -inf and inf as boundary, we imported them from you from scipy
 
     post = student_likelihood(mu, x)/integral
     return(post)
@@ -130,17 +130,26 @@ def expectedFoldChange(x,dist,mu_l=-100,mu_u=100):
        In [3]: expectedFoldChange(x,1)
        Out[3]: (1.7499999999991027, 0.30000000005131255, 3.2000000000527962)
     """
-    Dmu = 0.01 # Use this as "Delta mu"
+    Dmu = 0.01  # Use this as "Delta mu"
 
-    K = (mu_u-mu_l)/Dmu
+    # TODO Some really far decimals are incorrect
 
     if dist == 0:
-        p = 0
-        for i in range(K):
-            pass
-
+        p = student_posterior(np.arange(mu_l, mu_u+Dmu, Dmu), x)*Dmu
+        mean = np.arange(mu_l, mu_u+Dmu, Dmu) * p
+        meanFC = np.sum(mean, dtype=np.float64)
+        min_index = np.argmax(np.cumsum(p) > 0.025)
+        minFC = mu_l + min_index*Dmu
+        max_index = np.argmax(np.cumsum(p) > 0.975)
+        maxFC = mu_l + max_index*Dmu
     if dist == 1:
-        p = 0
+        p = gaussian_posterior(np.arange(mu_l, mu_u + Dmu, Dmu), x) * Dmu
+        mean = np.arange(mu_l, mu_u + Dmu, Dmu) * p
+        meanFC = np.sum(mean)
+        min_index = np.argmax(np.cumsum(p) > 0.025)
+        minFC = mu_l + min_index * Dmu
+        max_index = np.argmax(np.cumsum(p) > 0.975)
+        maxFC = mu_l + max_index * Dmu
 
 
     return(meanFC,minFC,maxFC)
@@ -196,5 +205,5 @@ def positiveFoldChange(x,dist,mu_u=100):
 
 if __name__ == '__main__':
     x = np.array([1, 2, 4, 0])
-    r = expectedFoldChange(x,0)
+    r = expectedFoldChange(x, 1)
     print(r)

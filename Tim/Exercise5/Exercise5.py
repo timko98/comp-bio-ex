@@ -80,9 +80,7 @@ def gaussian_posterior(mu,x):
                0.32256302])
     """
     n = len(x)
-    #post = (n/(2*np.pi*np.var(x))) * np.exp((-n/(2*np.var(x))) * (mu-np.mean(x))**2)
-    #post = (1/np.sqrt(np.var(x))*(2*np.pi/n)**-(1/2)) * np.exp((-n/2*np.var(x))* (np.mean(x)-mu)**2)
-    post = ((n * ((mu - np.mean(x))**2 + np.var(x)))**(-(n-1)/2))
+    post = (1 / (np.sqrt(np.var(x)) * np.sqrt(2*np.pi/n)))* np.exp((-(n/(2*np.var(x)))) * (np.mean(x)-mu)**2)
     return(post)
 
 def student_posterior(mu,x):
@@ -106,8 +104,9 @@ def student_posterior(mu,x):
                0.23983857])
     """
 
-    integral,error = quad() # To be completed! Use -inf and inf as boundary, we imported them from you from scipy
+    integral,error = quad(student_likelihood, -inf, inf, args=x) # To be completed! Use -inf and inf as boundary, we imported them from you from scipy
 
+    post = student_likelihood(mu, x)/integral
     return(post)
 
 def expectedFoldChange(x,dist,mu_l=-100,mu_u=100):
@@ -133,8 +132,13 @@ def expectedFoldChange(x,dist,mu_l=-100,mu_u=100):
     """
     Dmu = 0.01 # Use this as "Delta mu"
 
+    K = (mu_u-mu_l)/Dmu
+
     if dist == 0:
         p = 0
+        for i in range(K):
+            pass
+
     if dist == 1:
         p = 0
 
@@ -192,5 +196,5 @@ def positiveFoldChange(x,dist,mu_u=100):
 
 if __name__ == '__main__':
     x = np.array([1, 2, 4, 0])
-    r = gaussian_posterior(0.34,x)
+    r = expectedFoldChange(x,0)
     print(r)

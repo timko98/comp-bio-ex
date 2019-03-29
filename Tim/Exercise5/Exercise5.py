@@ -30,7 +30,9 @@ def gaussian_likelihood(mu,sigma2,x):
        array([4.35642886e-05,   1.71685844e-04,   4.28354889e-04,
               6.76609901e-04,   6.76609901e-04,   4.28354889e-04])
     """
+    n = len(x)
 
+    lik = ((1 / ((2*np.pi*sigma2)**(n/2))) * (np.exp((-n/(2*sigma2))*(((np.mean(x)-mu)**2) + np.var(x)))))
     return(lik)
 
 def student_likelihood(mu,x):
@@ -53,7 +55,8 @@ def student_likelihood(mu,x):
        array([ 0.26895718,  0.44552819,  0.70945206,  0.95862404,  0.95862404,
                0.70945206])
     """
-
+    n = len(x)
+    lik = (1 + ((np.mean(x)-mu)**2/(np.var(x))))**(-(n-1)/2)
     return(lik)
 
 def gaussian_posterior(mu,x):
@@ -76,7 +79,10 @@ def gaussian_posterior(mu,x):
        array([ 0.03280511,  0.12928417,  0.32256302,  0.50950588,  0.50950588,
                0.32256302])
     """
-    
+    n = len(x)
+    #post = (n/(2*np.pi*np.var(x))) * np.exp((-n/(2*np.var(x))) * (mu-np.mean(x))**2)
+    #post = (1/np.sqrt(np.var(x))*(2*np.pi/n)**-(1/2)) * np.exp((-n/2*np.var(x))* (np.mean(x)-mu)**2)
+    post = ((n * ((mu - np.mean(x))**2 + np.var(x)))**(-(n-1)/2))
     return(post)
 
 def student_posterior(mu,x):
@@ -128,9 +134,9 @@ def expectedFoldChange(x,dist,mu_l=-100,mu_u=100):
     Dmu = 0.01 # Use this as "Delta mu"
 
     if dist == 0:
-        p = 
+        p = 0
     if dist == 1:
-        p = 
+        p = 0
 
 
     return(meanFC,minFC,maxFC)
@@ -140,7 +146,7 @@ gene1 = np.array([-0.5989, 0.9163, -1.1192])
 gene2 = np.array([ 2.6043,  2.4013, 2.8432, 1.9412, 0.298])
 gene3 = np.array([ 2.9973,  4.5676, 1.8934, -1.1978, 1.7192, 4.0529, 0.325, -1.9837, 4.9612, -1.2523])
 gene4 = np.array([-2.729, 5.9134, -2.9845])
-gene5 = np.array([1.9134, 0.015]) 
+gene5 = np.array([1.9134, 0.015])
 
 def plot_gaussian_posterior(x):
     mu = np.arange(min(x)-2, max(x)+2,0.01)
@@ -175,12 +181,16 @@ def positiveFoldChange(x,dist,mu_u=100):
        Out[3]: 0.99118291198455866
     """
     Dmu = 0.01 # As before keep this step size for numerical integration
-    
+
     if dist == 0:
-        p = 
+        p = 0
     if dist == 1:
-        p = 
-        
+        p = 0
+
     return(p_positive)
 
 
+if __name__ == '__main__':
+    x = np.array([1, 2, 4, 0])
+    r = gaussian_posterior(0.34,x)
+    print(r)

@@ -131,28 +131,22 @@ def expectedFoldChange(x,dist,mu_l=-100,mu_u=100):
        Out[3]: (1.7499999999991027, 0.30000000005131255, 3.2000000000527962)
     """
     Dmu = 0.01  # Use this as "Delta mu"
-
-    # TODO Some really far decimals are incorrect
+    mu = np.arange(mu_l, mu_u + Dmu, Dmu)
 
     if dist == 0:
-        p = student_posterior(np.arange(mu_l, mu_u+Dmu, Dmu), x)*Dmu
-        mean = np.arange(mu_l, mu_u+Dmu, Dmu) * p
-        meanFC = np.sum(mean, dtype=np.float64)
-        min_index = np.argmax(np.cumsum(p) > 0.025)
-        minFC = mu_l + min_index*Dmu
-        max_index = np.argmax(np.cumsum(p) > 0.975)
-        maxFC = mu_l + max_index*Dmu
-    if dist == 1:
-        p = gaussian_posterior(np.arange(mu_l, mu_u + Dmu, Dmu), x) * Dmu
-        mean = np.arange(mu_l, mu_u + Dmu, Dmu) * p
-        meanFC = np.sum(mean)
-        min_index = np.argmax(np.cumsum(p) > 0.025)
-        minFC = mu_l + min_index * Dmu
-        max_index = np.argmax(np.cumsum(p) > 0.975)
-        maxFC = mu_l + max_index * Dmu
-
-
-    return(meanFC,minFC,maxFC)
+        p = student_posterior(mu, x) * Dmu
+        meanFC = np.mean(np.sum(p * mu))
+        minFC = mu[np.argmax(np.cumsum(p) >= 0.025)]
+        maxFC = mu[np.argmax(np.cumsum(p) >= 0.975)]
+        return (meanFC, minFC, maxFC)
+    elif dist == 1:
+        p = gaussian_posterior(mu, x) * Dmu
+        meanFC = np.mean(np.sum(p * mu))
+        minFC = mu[np.argmax(np.cumsum(p) >= 0.025)]
+        maxFC = mu[np.argmax(np.cumsum(p) >= 0.975)]
+        return (meanFC, minFC, maxFC)
+    else:
+        return
 
 
 gene1 = np.array([-0.5989, 0.9163, -1.1192])
@@ -201,3 +195,9 @@ def positiveFoldChange(x,dist,mu_u=100):
         p_positive = np.sum(gaussian_posterior(np.arange(0, mu_u + Dmu, Dmu), x) * Dmu)
 
     return(p_positive)
+
+
+if __name__ == '__main__':
+    x = np.array([1, 2, 4, 0])
+    r = positiveFoldChange(x,0)
+    print(r)

@@ -30,7 +30,9 @@ def gaussian_likelihood(mu,sigma2,x):
        array([4.35642886e-05,   1.71685844e-04,   4.28354889e-04,
               6.76609901e-04,   6.76609901e-04,   4.28354889e-04])
     """
+    n = len(x)
 
+    lik = ((1 / ((2*np.pi*sigma2)**(n/2))) * (np.exp((-n/(2*sigma2))*(((np.mean(x)-mu)**2) + np.var(x)))))
     return(lik)
 
 def student_likelihood(mu,x):
@@ -53,7 +55,8 @@ def student_likelihood(mu,x):
        array([ 0.26895718,  0.44552819,  0.70945206,  0.95862404,  0.95862404,
                0.70945206])
     """
-
+    n = len(x)
+    lik = (1 + ((np.mean(x)-mu)**2/(np.var(x))))**(-(n-1)/2)
     return(lik)
 
 def gaussian_posterior(mu,x):
@@ -76,7 +79,8 @@ def gaussian_posterior(mu,x):
        array([ 0.03280511,  0.12928417,  0.32256302,  0.50950588,  0.50950588,
                0.32256302])
     """
-    
+    n = len(x)
+    post = (1 / (np.sqrt(np.var(x)) * np.sqrt(2*np.pi/n)))* np.exp((-(n/(2*np.var(x)))) * (np.mean(x)-mu)**2)
     return(post)
 
 def student_posterior(mu,x):
@@ -100,8 +104,9 @@ def student_posterior(mu,x):
                0.23983857])
     """
 
-    integral,error = quad() # To be completed! Use -inf and inf as boundary, we imported them from you from scipy
+    integral, error = quad(student_likelihood, -inf, inf, args=x) # To be completed! Use -inf and inf as boundary, we imported them from you from scipy
 
+    post = student_likelihood(mu, x)/integral
     return(post)
 
 def expectedFoldChange(x,dist,mu_l=-100,mu_u=100):
@@ -125,22 +130,30 @@ def expectedFoldChange(x,dist,mu_l=-100,mu_u=100):
        In [3]: expectedFoldChange(x,1)
        Out[3]: (1.7499999999991027, 0.30000000005131255, 3.2000000000527962)
     """
-    Dmu = 0.01 # Use this as "Delta mu"
+    Dmu = 0.01  # Use this as "Delta mu"
+    mu = np.arange(mu_l, mu_u + Dmu, Dmu)
 
     if dist == 0:
-        p = 
-    if dist == 1:
-        p = 
-
-
-    return(meanFC,minFC,maxFC)
+        p = student_posterior(mu, x) * Dmu
+        meanFC = np.mean(np.sum(p * mu))
+        minFC = mu[np.argmax(np.cumsum(p) >= 0.025)]
+        maxFC = mu[np.argmax(np.cumsum(p) >= 0.975)]
+        return (meanFC, minFC, maxFC)
+    elif dist == 1:
+        p = gaussian_posterior(mu, x) * Dmu
+        meanFC = np.mean(np.sum(p * mu))
+        minFC = mu[np.argmax(np.cumsum(p) >= 0.025)]
+        maxFC = mu[np.argmax(np.cumsum(p) >= 0.975)]
+        return (meanFC, minFC, maxFC)
+    else:
+        return
 
 
 gene1 = np.array([-0.5989, 0.9163, -1.1192])
 gene2 = np.array([ 2.6043,  2.4013, 2.8432, 1.9412, 0.298])
 gene3 = np.array([ 2.9973,  4.5676, 1.8934, -1.1978, 1.7192, 4.0529, 0.325, -1.9837, 4.9612, -1.2523])
 gene4 = np.array([-2.729, 5.9134, -2.9845])
-gene5 = np.array([1.9134, 0.015]) 
+gene5 = np.array([1.9134, 0.015])
 
 def plot_gaussian_posterior(x):
     mu = np.arange(min(x)-2, max(x)+2,0.01)
@@ -175,12 +188,16 @@ def positiveFoldChange(x,dist,mu_u=100):
        Out[3]: 0.99118291198455866
     """
     Dmu = 0.01 # As before keep this step size for numerical integration
-    
+
     if dist == 0:
-        p = 
+        p_positive = np.sum(student_posterior(np.arange(0, mu_u + Dmu, Dmu), x) * Dmu)
     if dist == 1:
-        p = 
-        
+        p_positive = np.sum(gaussian_posterior(np.arange(0, mu_u + Dmu, Dmu), x) * Dmu)
+
     return(p_positive)
 
 
+if __name__ == '__main__':
+    x = np.array([1, 2, 4, 0])
+    r = positiveFoldChange(x,0)
+    print(r)

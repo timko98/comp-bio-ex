@@ -21,12 +21,12 @@ def gaussian_likelihood(mu,sigma2,x):
        lik: float if mu is float and numpy array if mu numpy array (likelihood)
     Example:
        In [1]: x = np.array([1,2,4,0])
-       
+
        In [2]: gaussian_likelihood(0.34,np.var(x),x)
        Out[2]: 0.00011634341807197585
 
        In [3]: gaussian_likelihood(np.arange(0,3,0.5),np.var(x),x)
-       Out[3]: 
+       Out[3]:
        array([4.35642886e-05,   1.71685844e-04,   4.28354889e-04,
               6.76609901e-04,   6.76609901e-04,   4.28354889e-04])
     """
@@ -51,7 +51,7 @@ def student_likelihood(mu,x):
        Out[2]: 0.37917854799162326
 
        In [3]: student_likelihood(np.arange(0,3,0.5),x)
-       Out[3]: 
+       Out[3]:
        array([ 0.26895718,  0.44552819,  0.70945206,  0.95862404,  0.95862404,
                0.70945206])
     """
@@ -75,7 +75,7 @@ def gaussian_posterior(mu,x):
        Out[2]: 0.087609796873199516
 
        In [3]: gaussian_posterior(np.arange(0,3,0.5),x)
-       Out[3]: 
+       Out[3]:
        array([ 0.03280511,  0.12928417,  0.32256302,  0.50950588,  0.50950588,
                0.32256302])
     """
@@ -99,7 +99,7 @@ def student_posterior(mu,x):
        Out[2]: 0.12818574525476051
 
        In [3]: student_posterior(np.arange(0,3,0.5),x)
-       Out[3]: 
+       Out[3]:
        array([ 0.09092412,  0.15061602,  0.23983857,  0.32407407,  0.32407407,
                0.23983857])
     """
@@ -115,7 +115,7 @@ def expectedFoldChange(x,dist,mu_l=-100,mu_u=100):
        meanFC,minFC,maxFC = expectedFoldChange(x,dist)
     Input argument:
        x: numpy array (observed fold changes)
-       dist: distribution. 0 = Student-t, 1 = Gaussian approximation 
+       dist: distribution. 0 = Student-t, 1 = Gaussian approximation
        mu_l, mu_u are the lower and upper values of mu where we do integrate
     Output argument:
        meanFC: float (mean fold change)
@@ -174,7 +174,7 @@ def positiveFoldChange(x,dist,mu_u=100):
        p_positive = positiveFoldChange(x,dist)
     Input argument:
        x: numpy array (observed fold changes)
-       dist: distribution. 0 = Student-t, 1 = Gaussian approximation 
+       dist: distribution. 0 = Student-t, 1 = Gaussian approximation
        mu_u is the upper limit of integration
     Output argument:
        p_positive: float ( P(mu>0|x) )
@@ -195,9 +195,3 @@ def positiveFoldChange(x,dist,mu_u=100):
         p_positive = np.sum(gaussian_posterior(np.arange(0, mu_u + Dmu, Dmu), x) * Dmu)
 
     return(p_positive)
-
-
-if __name__ == '__main__':
-    x = np.array([1, 2, 4, 0])
-    r = positiveFoldChange(x,0)
-    print(r)

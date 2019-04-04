@@ -57,9 +57,12 @@ def student_likelihood(mu, x):
        array([ 0.26895718,  0.44552819,  0.70945206,  0.95862404,  0.95862404,
                0.70945206])
     """
-
-    return (lik)
-
+    if isinstance(mu, float):
+        return (1+(np.mean(x)-mu)**2/np.var(x))**(-(x.size-1)/2)
+    lik = np.zeros(mu.size)
+    for i in range(mu.size):
+        lik[i] = (1+(np.mean(x)-mu[i])**2/np.var(x))**(-(x.size-1)/2)
+    return lik
 
 def gaussian_posterior(mu, x):
     """
@@ -203,3 +206,5 @@ if __name__ == '__main__':
     mu = np.zeros(1)
     print(gaussian_likelihood(0.34, np.var(x), x))
     print(gaussian_likelihood(np.arange(0, 3, 0.5), np.var(x), x))
+    print(student_likelihood(0.34, x))
+    print(student_likelihood(np.arange(0, 3, 0.5), x))

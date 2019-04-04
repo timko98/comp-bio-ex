@@ -84,7 +84,9 @@ def gaussian_posterior(mu, x):
        array([ 0.03280511,  0.12928417,  0.32256302,  0.50950588,  0.50950588,
                0.32256302])
     """
-    return (post)
+    # term = lambda mu: np.exp(-n/(2*(sigma**2))*((meanX-mu)**2+sigma**2))/((sigma**n)*((2*np.pi)**n/2))
+    post, error = quad(gaussian_likelihood, -inf, inf, args=(np.var(x), x))
+    return post
 
 
 def student_posterior(mu, x):
@@ -107,8 +109,8 @@ def student_posterior(mu, x):
        array([ 0.09092412,  0.15061602,  0.23983857,  0.32407407,  0.32407407,
                0.23983857])
     """
-
-    integral, error = quad()  # To be completed! Use -inf and inf as boundary, we imported them from you from scipy
+    post, error = quad(student_likelihood, -inf, inf, args=(x))
+    # integral, error = quad()  # To be completed! Use -inf and inf as boundary, we imported them from you from scipy
 
     return (post)
 
@@ -134,17 +136,25 @@ def expectedFoldChange(x, dist, mu_l=-100, mu_u=100):
        In [3]: expectedFoldChange(x,1)
        Out[3]: (1.7499999999991027, 0.30000000005131255, 3.2000000000527962)
     """
-    """
     Dmu = 0.01 # Use this as "Delta mu"
+    minFC = 0
+    maxFC = 0
 
     if dist == 0:
-        p =
+        for i in range(mu_l,mu_u,1):
+            p = student_posterior(i,x)*Dmu
+            minFC += p
+            maxFC += p * i
+
     if dist == 1:
-        p =
+        for i in range(mu_l, mu_u, 1):
+            p = gaussian_posterior(i, x) * Dmu
+            minFC += p
+            maxFC += p * i
 
-
+    meanFC = (minFC + maxFC) / 2
     return(meanFC,minFC,maxFC)
-    """
+
 
 
 gene1 = np.array([-0.5989, 0.9163, -1.1192])
@@ -203,8 +213,8 @@ def positiveFoldChange(x, dist, mu_u=100):
 
 if __name__ == '__main__':
     x = np.array([1, 2, 4, 0])
-    mu = np.zeros(1)
-    print(gaussian_likelihood(0.34, np.var(x), x))
-    print(gaussian_likelihood(np.arange(0, 3, 0.5), np.var(x), x))
-    print(student_likelihood(0.34, x))
-    print(student_likelihood(np.arange(0, 3, 0.5), x))
+    # print(gaussian_posterior(0.34,x))
+    # print(student_posterior(0.34,x))
+    # print(student_posterior(np.arange(0, 3, 0.5), x))
+    print(expectedFoldChange(x, 1))
+

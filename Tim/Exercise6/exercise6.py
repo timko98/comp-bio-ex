@@ -3,21 +3,24 @@
                        Exercise 6
 """
 
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 
 """
 Predefined Functions :
 """
 
-def exponentialPDF(x,a):
-    p = a*np.exp(-a*x)
-    p[x<0] = 0.0
-    return(p)
 
-def normalPDF(x,mu,sigma):
-    p = 1.0/(sigma*np.sqrt(2*np.pi))*np.exp(-(x-mu)**2/(2.0*sigma**2.0))
-    return(p)
+def exponentialPDF(x, a):
+    p = a * np.exp(-a * x)
+    p[x < 0] = 0.0
+    return (p)
+
+
+def normalPDF(x, mu, sigma):
+    p = 1.0 / (sigma * np.sqrt(2 * np.pi)) * np.exp(-(x - mu) ** 2 / (2.0 * sigma ** 2.0))
+    return (p)
+
 
 def loadData(file_name):
     """
@@ -38,11 +41,12 @@ def loadData(file_name):
     count = []
     for line in open(file_name):
         elm = line.split()
-        length.append(int(elm[2])-int(elm[1]))
+        length.append(int(elm[2]) - int(elm[1]))
         count.append(int(elm[4]))
-    return(np.array(length),np.array(count))
+    return (np.array(length), np.array(count))
 
-def plotData(x,rho,mu,sigma,lam):
+
+def plotData(x, rho, mu, sigma, lam):
     """
     Call:
        plotData(x,rho,mu,sigma,lam)
@@ -53,18 +57,18 @@ def plotData(x,rho,mu,sigma,lam):
        sigma: float
        lam: float
     """
-    xx = np.arange(min(x),max(x),0.01)
-    pG = normalPDF(xx,mu,sigma)
-    pE = exponentialPDF(xx,lam)
-    mix = rho*pG + (1-rho)*pE
-    plt.hist(x,100,normed=True,histtype='step',label='Data')
-    plt.plot(xx,rho*pG,label='Foreground')
-    plt.plot(xx,(1-rho)*pE,label='Background')
-    plt.plot(xx,mix,'--k',label='Mixture')
+    xx = np.arange(min(x), max(x), 0.01)
+    pG = normalPDF(xx, mu, sigma)
+    pE = exponentialPDF(xx, lam)
+    mix = rho * pG + (1 - rho) * pE
+    plt.hist(x, 100, normed=True, histtype='step', label='Data')
+    plt.plot(xx, rho * pG, label='Foreground')
+    plt.plot(xx, (1 - rho) * pE, label='Background')
+    plt.plot(xx, mix, '--k', label='Mixture')
     plt.legend()
     plt.xlabel('Log[Read Count]')
     plt.ylabel('Density')
-    plt.xlim((min(x),max(x)))
+    plt.xlim((min(x), max(x)))
     plt.show()
 
 
@@ -72,7 +76,8 @@ def plotData(x,rho,mu,sigma,lam):
 Functions to write :
 """
 
-def transformData(length,count,pseudoCount=0.5):
+
+def transformData(length, count, pseudoCount=0.5):
     """
     Call:
        x = transformData(length,count,pseudoCount)
@@ -89,9 +94,11 @@ def transformData(length,count,pseudoCount=0.5):
        x: array([ 1.70474809,  5.88192866,  5.21221467, ...,  4.6200588 ,
                   3.62434093,  4.19720195])
     """
-    return(x)
+    x = np.log(count/length + pseudoCount)
+    return (x)
 
-def mixture_logLikelihood(x,rho,mu,sigma,lam):
+
+def mixture_logLikelihood(x, rho, mu, sigma, lam):
     """
     Call:
        logLik = mixture_logLikelihood(x,rho,mu,sigma,lam)
@@ -110,9 +117,13 @@ def mixture_logLikelihood(x,rho,mu,sigma,lam):
        =>
        logLik: -7819.23354303
     """
-    return(logLik)
+    summand1 = normalPDF(x, mu, sigma)
+    summand2 = exponentialPDF(x, lam)
+    logLik = np.sum(np.log((rho * summand1) + (1-rho)*summand2))
+    return (logLik)
 
-def EM(x,rho,mu,sigma,lam,eps=0.0001):
+
+def EM(x, rho, mu, sigma, lam, eps=0.0001):
     """
     Call:
        logLik,rho,mu,sigma,lam = EM(x,rho,mu,sigma,lam)
@@ -154,9 +165,34 @@ def EM(x,rho,mu,sigma,lam,eps=0.0001):
        sigma : 1.2833068565940386
        lam :   0.5107133621362869
     """
-    return(logLik,rho,mu,sigma,lam)
+    converged = False
+    n = len(x)
+    logLik = list()
 
-def probForeground(x,rho,mu,sigma,lam):
+    while not converged:
+        old_log_lik = mixture_logLikelihood(x, rho, mu, sigma, lam)
+        L1 = normalPDF(x, mu, sigma)
+        L2 = exponentialPDF(x, lam)
+
+        p1_i = (rho * L1) / (rho * L1 + ((1 - rho) * L2))
+        p2_i = ((1 - rho) * L2) / (rho * L1 + ((1 - rho) * L2))
+
+        rho = np.sum(p1_i) / n
+        mu = np.sum(x * p1_i) / np.sum(p1_i)
+        sigma = np.sqrt(np.sum(((x - mu)**2) * p1_i) / np.sum(p1_i))
+        lam = np.sum(p2_i) / np.sum(x * p2_i)
+
+        new_log_lik = mixture_logLikelihood(x, rho, mu, sigma, lam)
+
+        logLik.append(old_log_lik)
+        if (np.abs(np.abs(new_log_lik) - np.abs(old_log_lik))) < eps:
+            logLik.append(new_log_lik)
+            converged = True
+
+    return (np.array(logLik), rho, mu, sigma, lam)
+
+
+def probForeground(x, rho, mu, sigma, lam):
     """
     Call:
        p = probForeground(x,rho,mu,sigma,lam)
@@ -177,5 +213,11 @@ def probForeground(x,rho,mu,sigma,lam):
        p : array([ 0.37122812,  0.98378583,  0.98330781, ...,  0.9786056 ,
                    0.94870896,  0.97102834])
     """
-    return(p)
+    L1 = normalPDF(x, mu, sigma)
+    L2 = exponentialPDF(x, lam)
 
+    p1_i = (rho * L1) / (rho * L1 + ((1 - rho) * L2))
+    p2_i = ((1 - rho) * L2) / (rho * L1 + ((1 - rho) * L2))
+
+    p = p1_i / (p1_i + p2_i)
+    return (p)

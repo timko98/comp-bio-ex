@@ -94,7 +94,7 @@ def transformData(length, count, pseudoCount=0.5):
        x: array([ 1.70474809,  5.88192866,  5.21221467, ...,  4.6200588 ,
                   3.62434093,  4.19720195])
     """
-    x = np.log(count/length + pseudoCount)
+    x = np.log(count / length + pseudoCount)
     return (x)
 
 
@@ -119,7 +119,7 @@ def mixture_logLikelihood(x, rho, mu, sigma, lam):
     """
     summand1 = normalPDF(x, mu, sigma)
     summand2 = exponentialPDF(x, lam)
-    logLik = np.sum(np.log((rho * summand1) + (1-rho)*summand2))
+    logLik = np.sum(np.log((rho * summand1) + (1 - rho) * summand2))
     return (logLik)
 
 
@@ -178,8 +178,8 @@ def EM(x, rho, mu, sigma, lam, eps=0.0001):
         p2_i = ((1 - rho) * L2) / (rho * L1 + ((1 - rho) * L2))
 
         rho = np.sum(p1_i) / n
+        sigma = np.sqrt(np.sum(((x - mu) ** 2) * p1_i) / np.sum(p1_i))
         mu = np.sum(x * p1_i) / np.sum(p1_i)
-        sigma = np.sqrt(np.sum(((x - mu)**2) * p1_i) / np.sum(p1_i))
         lam = np.sum(p2_i) / np.sum(x * p2_i)
 
         new_log_lik = mixture_logLikelihood(x, rho, mu, sigma, lam)

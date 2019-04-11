@@ -206,19 +206,3 @@ def probForeground(x,rho,mu,sigma,lam):
     p = p1 / (p1 + p2)
 
     return(p)
-
-if __name__ == "__main__":
-    length, count = loadData('H3K36ac.bed')
-    x = transformData(length,count)
-    logLik,rho,mu,sigma,lam = EM(x,0.5,1.3,0.4,0.3)
-
-    plt.semilogy(length, count, '.')
-    plt.xlabel("length")
-    plt.ylabel("counts")
-    plt.show()
-
-    print(logLik)
-    print(rho, mu, sigma, lam)
-    print(probForeground(x,rho,mu,sigma,lam))
-    plotData(x, rho, mu, sigma, lam)
-

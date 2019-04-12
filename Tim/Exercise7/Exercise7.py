@@ -54,7 +54,7 @@ def logLikelihood(x,rho,lam1,lam2):
        =>
        logLik: -4070.616429
     """
-
+    logLik = np.sum(np.log(rho*exponentialPDF(x, lam1)+(1-rho)*exponentialPDF(x, lam2)))
     return(logLik)
 
 
@@ -86,8 +86,41 @@ def EM(x,rho,lam1,lam2,eps=0.1):
        lam2: array([0.2, 0.052651, ..., 0.0079728, 0.0077882])
        (EM stops after 28 iterrations)
     """
+    n = len(x)
+    converged = False
+    logLik = list()
+    rho_list = list()
+    rho_list.append(rho)
+    lam1_list = list()
+    lam1_list.append(lam1)
+    lam2_list = list()
+    lam2_list.append(lam2)
 
-    return(logLik,rho,lam1,lam2)
+    while not converged:
+        old_log_lik = logLikelihood(x, rho, lam1, lam2)
+
+        L1 = exponentialPDF(x, lam1)
+        L2 = exponentialPDF(x, lam2)
+
+        p1_i = (rho * L1) / (rho * L1 + ((1 - rho) * L2))
+        p2_i = ((1 - rho) * L2) / (rho * L1 + ((1 - rho) * L2))
+
+        rho = np.sum(p1_i) / n
+        lam1 = np.sum(p1_i) / np.sum(x * p1_i)
+        lam2 = np.sum(p2_i) / np.sum(x * p2_i)
+
+        rho_list.append(rho)
+        lam1_list.append(lam1)
+        lam2_list.append(lam2)
+
+        new_log_lik = logLikelihood(x, rho, lam1, lam2)
+
+        logLik.append(old_log_lik)
+        if (np.abs(np.abs(new_log_lik) - np.abs(old_log_lik))) < eps:
+            logLik.append(new_log_lik)
+            converged = True
+
+    return(np.array(logLik),np.array(rho_list),np.array(lam1_list),np.array(lam2_list))
 
 
 def persistors(x,rho,lam1,lam2):
@@ -218,3 +251,10 @@ def plotDataAndModel(x,rho,lam1,lam2):
     yscale('log')
     ylim(1.0 / len(x), 1)
 #plotDataAndModel(x,rho,lam1,lam2)
+
+if __name__ == '__main__':
+    x = loadDeathData('data1.dat')
+    # logLik = logLikelihood(x, 0.8, 0.5, 0.05)
+    logLik, rho, lam1, lam2 = EM(x, 0.3, 0.4, 0.2)
+    idx = persistors(x, rho[-1], lam1[-1], lam2[-1])
+    print(idx)

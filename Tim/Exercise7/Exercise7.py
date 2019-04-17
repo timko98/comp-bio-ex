@@ -149,7 +149,18 @@ def persistors(x,rho,lam1,lam2):
                     ...
                     759, 766, 898, 915, 984, 985, 988, 990, 992])
     """
+    L1 = exponentialPDF(x, lam1)
+    L2 = exponentialPDF(x, lam2)
 
+    p1_i = (rho * L1) / (rho * L1 + ((1 - rho) * L2))
+    p2_i = ((1 - rho) * L2) / (rho * L1 + ((1 - rho) * L2))
+
+    if rho < 0.5:
+        p = p2_i / (p1_i + p2_i)
+    else:
+        p = p1_i / (p1_i + p2_i)
+
+    idx = np.argwhere(p < 0.5)
     return(idx)
 
 

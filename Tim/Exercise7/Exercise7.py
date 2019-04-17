@@ -226,6 +226,14 @@ def parameterCorrelations(C):
        F:
        array([ 0.72652167,  0.76173   ,  0.73845743])
     """
+    R = np.zeros((3,3))
+    for i in range(3):
+        for j in range(3):
+            R[i,j] = C[i,j] / np.sqrt(C[i,i]*C[j,j])
+
+    F = np.zeros(3)
+    for i in range(3):
+        F[i] = np.sqrt((1/3) * np.sum(1 - R[i]**2))
 
     return(R,F)
 
@@ -277,9 +285,3 @@ def plotDataAndModel(x,rho,lam1,lam2):
     yscale('log')
     ylim(1.0 / len(x), 1)
 #plotDataAndModel(x,rho,lam1,lam2)
-
-if __name__ == '__main__':
-    x = loadDeathData('data1.dat')
-    logLik, rho, lam1, lam2 = EM(x, 0.3, 0.4, 0.2)
-    C = EMcovariance(x, rho[-1], lam1[-1], lam2[-1])
-    print(C)

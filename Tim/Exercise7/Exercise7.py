@@ -185,7 +185,22 @@ def EMcovariance(x,rho,lam1,lam2):
               [ -1.91363013e-05,   1.78489229e-05,   1.92546421e-06],
               [ -8.30007943e-06,   1.92546421e-06,   2.00836782e-06]])
     """
+    L1 = exponentialPDF(x, lam1)
+    L2 = exponentialPDF(x, lam2)
 
+    f = rho * L1 + (1-rho) * L2
+
+    H = np.zeros((3,3))
+    H[0,0] = -np.sum(((L1-L2)**2 / f**2))
+    H[0,1] = np.sum(((((1-lam1*x)*np.exp(-lam1*x))*(lam2*np.exp(-lam2*x))) / (f**2)))
+    H[1,0] = np.sum(((((1-lam1*x)*np.exp(-lam1*x))*(lam2*np.exp(-lam2*x))) / (f**2)))
+    H[0,2] = np.sum((((-(1-lam2*x)*np.exp(-lam2*x))*(lam1*np.exp(-lam1*x))) / (f**2)))
+    H[2,0] = np.sum((((-(1-lam2*x)*np.exp(-lam2*x))*(lam1*np.exp(-lam1*x))) / (f**2)))
+    H[1,1] = np.sum(((-(rho**2)*np.exp(-2*lam1*x)) + (rho * (1-rho) * lam2 * x * (-2 + lam1*x) * np.exp(-lam1 *x) * np.exp(-lam2*x))) / (f**2))
+    H[1,2] = - np.sum(((1-rho) * (1 - lam2*x) * np.exp(-lam2 * x) * rho * (1 - lam1 * x) * np.exp(-lam1 * x)) / (f**2))
+    H[2,1] = - np.sum(((1 - rho) * (1 - lam2 * x) * np.exp(-lam2 * x) * rho * (1 - lam1 * x) * np.exp(-lam1 * x)) / (f ** 2))
+    H[2,2] = np.sum(((-((1-rho)**2) * np.exp(-2 * lam2 * x)) + (rho * (1-rho) * lam1 * x * (-2 + lam2 * x) * np.exp(-lam1 * x) * np.exp(-lam2 * x))) / (f**2))
+    C = np.linalg.inv(-H)
     return(C)
 
 
@@ -265,7 +280,6 @@ def plotDataAndModel(x,rho,lam1,lam2):
 
 if __name__ == '__main__':
     x = loadDeathData('data1.dat')
-    # logLik = logLikelihood(x, 0.8, 0.5, 0.05)
     logLik, rho, lam1, lam2 = EM(x, 0.3, 0.4, 0.2)
-    idx = persistors(x, rho[-1], lam1[-1], lam2[-1])
-    print(idx)
+    C = EMcovariance(x, rho[-1], lam1[-1], lam2[-1])
+    print(C)

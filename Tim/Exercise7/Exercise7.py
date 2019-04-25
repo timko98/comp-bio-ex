@@ -161,7 +161,7 @@ def persistors(x,rho,lam1,lam2):
         p = p1_i / (p1_i + p2_i)
 
     idx = np.argwhere(p < 0.5)
-    return(idx)
+    return(idx.ravel())
 
 
 def EMcovariance(x,rho,lam1,lam2):

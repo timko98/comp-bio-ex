@@ -61,6 +61,9 @@ def Covariance(E):
          24798866.42069558]])
 
     """
+    G = E.shape[0]
+    mean_E = E - 1 / G * np.sum(E, axis=0)
+    C = 1/G * np.dot(mean_E.T, mean_E)
     
     return(C)
 
@@ -89,6 +92,7 @@ def PCA(E):
        [-0.6042583 , -0.67012803, -0.08268436,  0.03673943, -0.0608554 ,
          0.33481758, -0.24861145]])  
     """
+    d, V = np.linalg.eig(Covariance(E))
     return(d,V)
 
 
@@ -113,7 +117,11 @@ def FOV(E):
       array([-0.28408722,  0.07507864,  0.75645989,  0.05071601,  0.38141332,
         -0.32873977, -0.29207536])]
     """
- 
+    C = Covariance(E)
+    d, V = PCA(E)
+    D = np.dot(V.T, np.dot(C, V))
+    frac = (np.diag(D) / np.sum(D))[:2]
+    TwoCom = np.array([V[0, :], V[1, :]])
     return (frac,TwoCom)
 
 
@@ -137,3 +145,9 @@ def Project2(E):
           0.18522836,   5.57246455])) 
     """
     return(p1,p2)
+
+
+if __name__ == "__main__":
+    rn, cn, E = loadData('dataSet8.dat')
+    fov, TwoCom = FOV(E)
+    print(TwoCom)

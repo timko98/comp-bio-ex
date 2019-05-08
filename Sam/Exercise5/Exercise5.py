@@ -150,20 +150,22 @@ gene3 = np.array([ 2.9973,  4.5676, 1.8934, -1.1978, 1.7192, 4.0529, 0.325, -1.9
 gene4 = np.array([-2.729, 5.9134, -2.9845])
 gene5 = np.array([1.9134, 0.015])
 
-def plot_gaussian_posterior(x):
+def plot_gaussian_posterior(x, i):
     mu = np.arange(min(x)-2, max(x)+2,0.01)
     plt.plot(mu,gaussian_posterior(mu,x))
     plt.xlabel('mu')
     plt.ylabel('P(mu|x)')
-    plt.show()
+    plt.title('gaussian '+ str(i))
+
     return
 
-def plot_student_posterior(x):
+def plot_student_posterior(x, i):
     mu = np.arange(min(x)-2, max(x)+2,0.01)
     plt.plot(mu,student_posterior(mu,x))
     plt.xlabel('mu')
     plt.ylabel('P(mu|x)')
-    plt.show()
+    plt.title('student ' + str(i))
+
     return
 
 def positiveFoldChange(x,dist,mu_u=100):
@@ -195,4 +197,24 @@ def positiveFoldChange(x,dist,mu_u=100):
 
     p_positive = np.sum(p * Dmu)
     return(p_positive)
+
+if __name__ == "__main__":
+    plot_gaussian_posterior(gene1, 1)
+    plot_student_posterior(gene1, 1)
+    plt.show()
+    plot_gaussian_posterior(gene2, 2)
+    plot_student_posterior(gene2, 2)
+    plt.show()
+    plot_gaussian_posterior(gene3, 3)
+    plot_student_posterior(gene3, 3)
+    plt.show()
+    plot_gaussian_posterior(gene4, 4)
+    plot_student_posterior(gene4, 4)
+    plt.show()
+    plot_gaussian_posterior(gene5, 5)
+    plot_student_posterior(gene5, 5)
+    plt.show()
+
+
+
 

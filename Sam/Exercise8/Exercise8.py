@@ -144,10 +144,8 @@ def Project2(E):
         array([ 25.8301278 , 134.89895448,   9.70570268, ...,   2.6057352 ,
           0.18522836,   5.57246455])) 
     """
-    return(p1,p2)
-
-
-if __name__ == "__main__":
-    rn, cn, E = loadData('dataSet8.dat')
     fov, TwoCom = FOV(E)
-    print(TwoCom)
+    print(fov, TwoCom)
+    p1 = np.dot(TwoCom[0], E.T)
+    p2 = np.dot(TwoCom[1], E.T)
+    return(p1,p2)

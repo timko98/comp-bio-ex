@@ -99,7 +99,6 @@ def independentLML(counts, lam=1.0):
        =>
        -1342.7630822
     """
-    gamma = lambda x: np.math.factorial(x - 1)
     counts = counts.reshape(-1, 1)
     n = np.sum(counts)
     logLM = gammaln(2 * lam) \

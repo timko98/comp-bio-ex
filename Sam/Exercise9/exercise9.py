@@ -22,7 +22,7 @@ def Z(lambda1, lambda2):
     =>
     0.16666666666666666
     '''
-
+    z = 1/(lambda1**2 * lambda2 + lambda1 * lambda2**2)
 
     return(z)
 
@@ -47,6 +47,10 @@ def lambdas(mean_a, mean_b):
     0.45344443867938028,
     3.0488597087860572]
     '''
+    a = 2 * mean_a - mean_b
+    b = 2 * mean_b - mean_a
+    c = sqrt(mean_a ** 2 - mean_a * mean_b + mean_b ** 2)
+    result = [3 / (a + c), 3 / (a - c), 3 / (b + c), 3 / (b - c)]
 
     return(result)
 
@@ -62,8 +66,11 @@ def get_means_xyz(mean_a, mean_b):
     =>
     [1.3873397496678903, 1.8126602503321101, 5.9126602503321095]
     '''
-    
-
+    l1, _, l2, _ = lambdas(mean_a, mean_b)
+    mean_x = 1 / (l1 + l2)
+    mean_y = 1 / l1
+    mean_z = 1 / l2
+    result = [mean_x, mean_y, mean_z]
     return(result)
 
 
@@ -79,6 +86,13 @@ def get_covariance(mean_a, mean_b):
     matrix([[ 82.1279196 ,   4.32358638],
             [  4.32358638,  11.72566678]])
     '''
+
+    l1, _, l2, _ = lambdas(mean_a, mean_b)
+    cov_mat = array([[0, 0], [0, 0]], dtype=float)
+    cov_mat[0,0] = 1 / (l1 + l2)**2 + 1 / l1**2
+    cov_mat[0,1] = 1 / (l1 + l2)**2
+    cov_mat[1,0] = cov_mat[0,1]
+    cov_mat[1,1] = 1 / (l1 + l2)**2 + 1 / l2**2
 
     return(cov_mat)
 
@@ -122,4 +136,3 @@ def plot_mean():
     plt.ylabel('mean b')
     plt.title('Mean z')
     plt.show()
-
